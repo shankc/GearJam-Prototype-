@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/album_item"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <com.kaidoh.mayuukhvarshney.gearjam.SquareImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:layout_centerInParent="true"
+        android:adjustViewBounds="true"
+        android:layout_weight="1"
+        android:id="@+id/cover"
+        />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/cover"
+        android:background="#70000000"
+        android:padding="6dp" >
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="#FBFBEF"
+            android:textSize="12sp"
+            android:typeface="monospace"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</RelativeLayout>

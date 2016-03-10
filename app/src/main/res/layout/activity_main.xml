@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/grid_view1"
+    style="@style/PhotoGrid"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#151515"
+    android:columnWidth="@dimen/photo_size"
+    android:horizontalSpacing="@dimen/photo_spacing"
+    android:numColumns="2"
+    android:padding="4dp"
+    android:scrollbars="none"
+    android:stretchMode="columnWidth"
+    android:verticalSpacing="@dimen/photo_spacing" />
+
