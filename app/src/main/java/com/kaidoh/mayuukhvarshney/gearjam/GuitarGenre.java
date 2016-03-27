@@ -2,6 +2,7 @@ package com.kaidoh.mayuukhvarshney.gearjam;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
@@ -19,6 +20,8 @@ private static int[] ICONS={R.drawable.slash_rock,R.drawable.acoustic,R.drawable
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar= (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
 
 
 
@@ -36,11 +39,39 @@ private static int[] ICONS={R.drawable.slash_rock,R.drawable.acoustic,R.drawable
         GuitarGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(GuitarGenre.this, DisplayTrackActivity.class);
                 if (position == 0) {
 
-                    Intent intent= new Intent(GuitarGenre.this,DisplayTrackActivity.class);
-                    intent.putExtra("Instrument","guitar");
-                    intent.putExtra("Genre","rock");
+                    intent.putExtra("Instrument", "guitar");
+                    intent.putExtra("Genre", "rock");
+                    startActivity(intent);
+                } else if (position == 1) {
+                    intent.putExtra("Instrument", "guitar");
+                    intent.putExtra("Genre", "acoustic");
+                    startActivity(intent);
+                } else if (position == 2) {
+                    intent.putExtra("Instrument", "guitar");
+                    intent.putExtra("Genre", "jazz");
+                    startActivity(intent);
+                } else if (position == 3) {
+                    intent.putExtra("Instrument", "guitar");
+                    intent.putExtra("Genre", "pop");
+                    startActivity(intent);
+                } else if (position == 4) {
+                    intent.putExtra("Instrument", "guitar");
+                    intent.putExtra("Genre", "metal");
+                    startActivity(intent);
+                } else if (position == 5) {
+                    intent.putExtra("Instrument", "guitar");
+                    intent.putExtra("Genre", "instrumental");
+                    startActivity(intent);
+                } else if (position == 6) {
+                    intent.putExtra("Instrument", "guitar");
+                    intent.putExtra("Genre", "blues");
+                    startActivity(intent);
+                } else {
+                    intent.putExtra("Instrument", "guitar");
+                    intent.putExtra("Genre","folk");
                     startActivity(intent);
                 }
             }
@@ -60,6 +91,12 @@ private static int[] ICONS={R.drawable.slash_rock,R.drawable.acoustic,R.drawable
                 }
             }
         });
+    }
+    @Override
+    public void onBackPressed(){
+        //super.onBackPressed();
+        Intent intent = new Intent(this,MainActivity.class);
+        startActivity(intent);
     }
 
 }

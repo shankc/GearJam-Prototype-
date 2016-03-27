@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    style="@style/seekbar">
+    <ListView
+        android:id="@+id/track_list_view"
+        android:layout_weight="100"
+        android:layout_width="match_parent"
+        android:background="@drawable/images4"
+        android:layout_height="0dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/my_toolbar"
+            android:background="#050100"
+            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:layout_width="match_parent"
+            android:layout_height="125dp"
+            >
+
+            <ImageView
+                android:id="@+id/selected_track_image"
+                android:layout_width="66dp"
+                android:layout_height="72dp"/>
+
+
+            <ImageView
+                android:id="@+id/player_control"
+                android:layout_gravity="right"
+                android:layout_marginTop="47dp"
+                android:layout_width="@dimen/image_size"
+                android:layout_height="@dimen/image_size"/>
+            <ImageView
+                android:id="@+id/soundcloud_icon"
+                android:layout_width="55dp"
+                android:layout_height="35dp"
+                android:layout_gravity="right"
+                android:layout_marginTop="92dp"
+                android:layout_below="@id/player_control"
+                android:layout_alignParentBottom="true"
+                >
+
+            </ImageView>
+            <SeekBar
+                android:id="@+id/seek_bar"
+                android:layout_width="220dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="78dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:progressDrawable="@drawable/red_scrubber_progress"
+                android:thumb="@drawable/red_scrubber_control">
+
+
+            </SeekBar>
+
+            <!-- android:thumb="@drawable/abc_switch_track_mtrl_alpha"
+             android:indeterminate="false"
+             android:progress="@integer/abc_max_action_buttons"-->
+
+        </android.support.v7.widget.Toolbar>
+
+        <TextView
+            android:id="@+id/selected_track_title"
+            android:textSize="12dp"
+            android:paddingTop="18dp"
+            android:paddingLeft="12dp"
+            android:layout_width="35dp"
+            android:layout_height="55dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="80dp"
+            android:layout_marginStart="80dp"
+            android:layout_alignParentRight="true"
+            android:textColor="#FDFCFA"
+            android:layout_alignParentEnd="true" />
+        <TextView
+            android:id="@+id/artist_name"
+            android:layout_width="23dp"
+            android:textSize="9dp"
+            android:layout_height="32dp"
+            android:textColor="#FDFCFA"
+            android:paddingBottom="20dp"
+            android:paddingLeft="10dp"
+            android:layout_centerVertical="true"
+            android:layout_alignLeft="@+id/selected_track_title"
+            android:layout_alignStart="@+id/selected_track_title"
+            android:layout_alignRight="@+id/selected_track_title"
+            android:layout_alignEnd="@+id/selected_track_title">
+
+
+        </TextView>
+
+
+
+
+    </RelativeLayout>
+
+
+
+
+</LinearLayout>

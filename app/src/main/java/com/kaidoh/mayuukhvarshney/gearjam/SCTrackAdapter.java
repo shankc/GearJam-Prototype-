@@ -52,7 +52,6 @@ import java.util.List;
                 holder = new ViewHolder();
                 holder.trackImageView = (ImageView) convertView.findViewById(R.id.track_image);
                 holder.titleTextView = (TextView) convertView.findViewById(R.id.track_title);
-                holder.genreTextView=(TextView)convertView.findViewById(R.id.track_genre);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -68,7 +67,15 @@ import java.util.List;
             //holder.genreTextView.setText(tra.getmTrackType());
 
             // Trigger the download of the URL asynchronously into the image view.
+            if(track.getArtworkURL()!=null){
             Picasso.with(mContext).load(track.getArtworkURL()).into(holder.trackImageView);
+            }
+            else {
+                //Picasso.with(mContext).load(track.getmWaveformURL()).into(holder.trackImageView);
+                holder.trackImageView.setImageResource(R.drawable.default_pic);
+            }
+
+
 
             return convertView;
         }

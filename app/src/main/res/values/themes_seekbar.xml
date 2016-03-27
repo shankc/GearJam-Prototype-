@@ -4,7 +4,7 @@
 
   <style name="seekbar" parent="android:Theme.Holo">
 
-    <item name="android:seekBarStyle">@style/SeekBarseekbar</item>
+
 
   </style>
 

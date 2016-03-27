@@ -1,13 +1,20 @@
 package com.kaidoh.mayuukhvarshney.gearjam;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.GridView;
-public class MainActivity extends Activity {
+import android.widget.Toast;
+public class MainActivity extends AppCompatActivity{
     protected  GridView photoGrid;
     protected int mPhotoSize, mPhotoSpacing;
     protected ImageAdapter imageAdapter;
@@ -21,7 +28,21 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar= (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
 
+
+        ConnectivityManager cm =
+                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        if(!isConnected)
+        {
+            Toast.makeText(this,"Unable to Connect :(",Toast.LENGTH_SHORT).show();
+        }
 
 
 // get the photo size and spacing
@@ -43,11 +64,24 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //Toast.makeText(MainActivity.this,"item clikced " +position,Toast.LENGTH_SHORT).show();
-
                 if (position == 0) {
-                    Intent intent = new Intent(MainActivity.this,GuitarGenre.class);
+                    Intent intent = new Intent(MainActivity.this, GuitarGenre.class);
                     startActivity(intent);
 
+                } else if (position == 1) {
+                    Intent intent = new Intent(MainActivity.this, ViolinGenre.class);
+                    startActivity(intent);
+
+                } else if (position == 2) {
+                    Intent intent = new Intent(MainActivity.this,ElectronicGenre.class);
+                    startActivity(intent);
+                }
+                else if(position==3){
+
+                }
+                else if(position==4){
+                    Intent intent = new Intent(MainActivity.this,SitarGenre.class);
+                    startActivity(intent);
                 }
             }
         });
@@ -67,6 +101,32 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+    @Override
+    public boolean onCreateOptionsMenu (Menu menu){
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item){
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+
+        }
+        else if(id==R.id.playlist_item){
+            Intent intent= new Intent(this,Playlist.class);
+            startActivity(intent);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 

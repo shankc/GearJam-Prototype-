@@ -20,20 +20,24 @@ public class Track {
 
     private String mArtworkURL;
 
-    @SerializedName("genre")
-    private String mgenre;
+
 
     @SerializedName("user")
     private Users mUser;
 
-    @SerializedName("playback_count")
-    private Integer mPlaybackCount;
+    @SerializedName("id")
+    private int mID;
+ @SerializedName("waveform_url")
+ private String mWaveformURL;
+
     public String getTitle() {
         return mTitle;
     }
 
+public String getmWaveformURL(){
+    return mWaveformURL;
+}
 
-    public Integer getPlaybackCount(){ return mPlaybackCount;}
 
     public String getStreamURL() {
         return mStreamURL;
@@ -42,9 +46,10 @@ public class Track {
     public String getArtworkURL() {
         return mArtworkURL;
     }
-    public String getTrackType(){
-        return mgenre;
+    public int getID() {
+        return mID;
     }
+
 
     public Users getUser(){return mUser;}
 
