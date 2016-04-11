@@ -5,25 +5,25 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     style="@style/seekbar">
-<android.support.v7.widget.Toolbar
-    android:id="@+id/main_toolbar"
-    android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:background="?attr/colorPrimary"
-    android:elevation="4dp"
-    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/grid_view1"
-    style="@style/PhotoGrid"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#151515"
-    android:columnWidth="@dimen/photo_size"
-    android:horizontalSpacing="@dimen/photo_spacing"
-    android:numColumns="2"
-    android:padding="4dp"
-    android:scrollbars="none"
-    android:stretchMode="columnWidth"
-    android:verticalSpacing="@dimen/photo_spacing" />
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+    <GridView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/grid_view1"
+        style="@style/PhotoGrid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#151515"
+        android:columnWidth="@dimen/photo_size"
+        android:horizontalSpacing="@dimen/photo_spacing"
+        android:numColumns="2"
+        android:padding="4dp"
+        android:scrollbars="none"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="@dimen/photo_spacing" />
 </LinearLayout>

@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,18 +21,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.kaidoh.mayuukhvarshney.gearjam.MusicService.MusicBinder;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -38,26 +37,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
-public class DisplayTrackActivity extends AppCompatActivity{
+public class DisplayTrackActivity extends AppCompatActivity implements SongList.DataPass{
 
     private static final String TAG = "DisplayTrackActivity";
 
     private List<Track> mPlayListItems;
     private Set<Track> Song_Set;
     private SCTrackAdapter mAdapter;
-    private TextView mSelectedTrackTitle,mArtistTitile;
-    private ImageView mSelectedTrackImage,Sc_icon;
-    private MediaPlayer mMediaPlayer;
+    protected TextView mSelectedTrackTitle,mArtistTitile;
+    protected  ImageView mSelectedTrackImage,Sc_icon;
+    protected MediaPlayer mMediaPlayer;
     private ImageView mPlayerControl;
     private SeekBar mSeek_Bar;
     private boolean Pause=false;
-    private int Current_position=0;
-    private long mediapos;
-    private long mediamax;
+    protected int Current_position=0;
+    protected long mediapos;
+    protected long mediamax;
     private ListView listView;
     public MusicService musicSrv=new MusicService();
     private Track track=new Track();
@@ -66,8 +61,10 @@ public class DisplayTrackActivity extends AppCompatActivity{
     private boolean Preparation = true;
     private boolean musicBound=false;
     private BroadcastReceiver mMessageReceiver;
-    String Inst,category;
+    protected String Inst,category,SuperInst,Supercategory;
     private Intent playIntent;
+  protected Playlist  playlist;
+    protected  File folder;
     Map<String, String> params = new HashMap<>();
     Map<String, Integer> offset = new HashMap<>();
     @Override
@@ -76,6 +73,12 @@ public class DisplayTrackActivity extends AppCompatActivity{
         setContentView(R.layout.track_list);
         Toolbar toolbar= (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
+
+        AppControl app= (AppControl)getApplication();
+        playlist=app.play;
+
+        AppControl appcontrolreverse= (AppControl)getApplication();
+        appcontrolreverse.Display=this;
 
         if(savedInstanceState==null)
         {
@@ -89,8 +92,27 @@ public class DisplayTrackActivity extends AppCompatActivity{
             category=(String)savedInstanceState.getSerializable("Genre");
         }
 
-        File folder = new File(Environment.getExternalStorageDirectory() +
-                File.separator + "GearJam");
+        //Bundle bundle = new Bundle();
+        //bundle.putString("Instrument", Inst);
+        //bundle.putString("Genre",category);
+        //SongList fragobj = new SongList();
+        //fragobj.setArguments(bundle);
+        //SongList SongFragment = new SongList();
+        //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        //ft.add(R.id.FragmentContainer, SongFragment);
+        //ft.commit();
+        SongList fragobj=new SongList();
+        Bundle bundle=new Bundle();
+        bundle.putString("Instrument", Inst);
+        bundle.putString("Genre", category);
+        fragobj.setArguments(bundle);
+        FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.FragmentContainer, fragobj);
+        ft.addToBackStack(null);
+        ft.commit();
+
+      folder = new File(Environment.getExternalStorageDirectory()+File.separator+"GearJam");
+
         boolean success=true;
         if(!folder.exists())
         {
@@ -100,12 +122,16 @@ public class DisplayTrackActivity extends AppCompatActivity{
         if(success){
             Log.d(TAG,"folder made!!");
         }
+        //SongList SongFragment = new SongList();
+        //getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+        //getSupportFragmentManager().beginTransaction().add(R.id.FragmentContainer, SongFragment).commit();
         // calling adapter here...
-        mPlayListItems = new ArrayList<Track>();
+      /*  mPlayListItems = new ArrayList<Track>();
         Song_Set=new LinkedHashSet<Track>(mPlayListItems);
         listView = (ListView) findViewById(R.id.track_list_view);
         mAdapter = new SCTrackAdapter(this, mPlayListItems);
-        listView.setAdapter(mAdapter);
+        listView.setAdapter(mAdapter); */
 
         // setting the buttons and icons via id's.
 
@@ -115,7 +141,7 @@ public class DisplayTrackActivity extends AppCompatActivity{
         mPlayerControl = (ImageView) findViewById(R.id.player_control);
         mArtistTitile=(TextView) findViewById(R.id.artist_name);
         Sc_icon=(ImageView)findViewById(R.id.soundcloud_icon);
-        mSelectedTrackImage.setImageResource(R.drawable.waiting_image);
+       // mSelectedTrackImage.setImageResource(R.drawable.waiting_image);
         Sc_icon.setImageResource(R.drawable.logo_sc_white);
 
 
@@ -129,23 +155,10 @@ public class DisplayTrackActivity extends AppCompatActivity{
 
 
 // clicking of a list view.
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //  Next_position=position;
-                Track track = mPlayListItems.get(position);
-                musicSrv.setSong(position);
-                Current_position = position;
-                mSelectedTrackTitle.setText(track.getTitle());
-                mArtistTitile.setText(track.getUser().getUsername());
-                Picasso.with(DisplayTrackActivity.this).load(track.getArtworkURL()).into(mSelectedTrackImage);
-                musicSrv.playSong();
 
-            }
-        });
         // download song as a playlist.
 
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        /*listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 track = mPlayListItems.get(position);
@@ -156,9 +169,9 @@ public class DisplayTrackActivity extends AppCompatActivity{
 
                 return true;
             }
-        });
+        });*/
 // Initializing the soundcloud to fill the list view with songs.
-        SCService scService = SoundCloud.getService();
+       /* SCService scService = SoundCloud.getService();
 
 // Query parameters added into the app according to key value pairs.
         params.put("q",Inst);
@@ -183,8 +196,8 @@ public class DisplayTrackActivity extends AppCompatActivity{
                 Toast.makeText(DisplayTrackActivity.this, "There was a Problem :(", Toast.LENGTH_SHORT).show();
             }
 
-        });
-         mMessageReceiver = new BroadcastReceiver() {
+        });*/
+        mMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 int index;
@@ -199,12 +212,17 @@ public class DisplayTrackActivity extends AppCompatActivity{
                     Picasso.with(DisplayTrackActivity.this).load(track.getArtworkURL()).into(mSelectedTrackImage);
                 }
                 ToggleSwitch();
-                 SeekInit();
+                SeekInit();
 
             }
         };
+        FragmentManager fm = getSupportFragmentManager();
 
-        }
+//if you added fragment via layout xml
+
+
+
+    }
 
 
 
@@ -257,27 +275,27 @@ public class DisplayTrackActivity extends AppCompatActivity{
 
     public void Toggle() {
 
-            if (musicSrv.isPng()) {
-                Pause = true;
-                musicSrv.pausePlayer();
-                mPlayerControl.setImageResource(R.drawable.ic_play_circle_filled_white_24dp);
-            } else {
-                Pause = false;
-                musicSrv.go();
-                mPlayerControl.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp);
-            }
-            musicSrv.PauseState(Pause);
+        if (musicSrv.isPng()) {
+            Pause = true;
+            musicSrv.pausePlayer();
+            mPlayerControl.setImageResource(R.drawable.ic_play_circle_filled_white_24dp);
+        } else {
+            Pause = false;
+            musicSrv.go();
+            mPlayerControl.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp);
+        }
+        musicSrv.PauseState(Pause);
 
     }
     //auto toggle of during auto play.
     public void ToggleSwitch() {
-                if(musicSrv.isPng()) {
-                    mPlayerControl.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp);
-                }
+        if(musicSrv.isPng()) {
+            mPlayerControl.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp);
+        }
         else
-                {
-                    mPlayerControl.setImageResource(R.drawable.ic_play_circle_filled_white_24dp);
-                }
+        {
+            mPlayerControl.setImageResource(R.drawable.ic_play_circle_filled_white_24dp);
+        }
 
 
     }
@@ -294,16 +312,14 @@ public class DisplayTrackActivity extends AppCompatActivity{
     }
 
 
-
-
     @Override
     protected void onPause(){
-       super.onPause();
-       // Pause= true;
+        super.onPause();
+        // Pause= true;
         //musicSrv.StopPlayer();
         Log.d("DisplayTrackActivity", "Pause statte Reached");
         if(musicSrv.equals(null)){
-            Log.d("DisplayTrackActivty","~True");
+            Log.d("DisplayTrackActivty", "~True");
         }
     }
     @Override
@@ -319,19 +335,65 @@ public class DisplayTrackActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
-       // musicSrv= new MusicService();
+        mSeek_Bar.setMax(0);
+
+
+        Log.d("DisplayTrackActivity", "the current instrument " + SuperInst);
+        if(playlist==null)
+        {
+            Log.d("DisplayTrackActivity","playlist reference has become null");
+        }
+        else{
+        Log.d("DisplayTrackActivity"," the playlist reference right now false");}
+        SongList fragment = (SongList) getSupportFragmentManager().findFragmentById(R.id.FragmentContainer);
+
+        // musicSrv= new MusicService();
+
+
         if(musicSrv.equals(null)){
             Log.d("DisplayTrackActivty","~True");
         }
+        if(musicBound && SuperInst!=null)
+        {
+            SongList fragobj=new SongList();
+            Bundle bundle=new Bundle();
+            bundle.putString("Instrument", SuperInst);
+            bundle.putString("Genre", Supercategory);
+            fragobj.setArguments(bundle);
+            FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.FragmentContainer, fragobj);
+            ft.addToBackStack(null);
+            ft.commit();
 
-            LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                    new IntentFilter("Prep"));
-            Log.d("DisplayTrackACtivity", "On Resume STate reached " + musicBound);
-            if (Pause) {
+//          SongList fragment = (SongList) getSupportFragmentManager().findFragmentById(R.id.FragmentContainer);
+           //musicSrv.setList(fragment.theSongList());
+            //onDataPass(fragment.mPlayListItems);
+        }
+        else if(!musicBound && SuperInst!=null)
+        {
+            Log.d("DisplayTrackActivity","In else if method");
+            onStart();
+            SongList fragobj=new SongList();
+            Bundle bundle=new Bundle();
+            bundle.putString("Instrument", SuperInst);
+            bundle.putString("Genre", Supercategory);
+            fragobj.setArguments(bundle);
+            FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.FragmentContainer, fragobj);
+            ft.addToBackStack(null);
+            ft.commit();
 
-                Pause = false;
-                musicSrv.PauseState(Pause);
-            }
+        }
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter("Prep"));
+        Log.d("DisplayTrackACtivity", "On Resume STate reached " + musicBound);
+
+        if (Pause) {
+
+            Pause = false;
+            musicSrv.PauseState(Pause);
+        }
 
 
 
@@ -340,6 +402,7 @@ public class DisplayTrackActivity extends AppCompatActivity{
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            //SongList songfragment=(SongList)getSupportFragmentManager().
             MusicBinder binder = (MusicBinder)service;
             //get service
             musicSrv = binder.getService();
@@ -358,25 +421,86 @@ public class DisplayTrackActivity extends AppCompatActivity{
     @Override
     public void onBackPressed()
     {
-        if(Inst.equals("Trance")){
-            Intent intent = new Intent(this,ElectronicGenre.class);
-            startActivity(intent);
-        }
-        else if(Inst.equals("guitar")){
-            Intent intent = new Intent(this,GuitarGenre.class);
-            startActivity(intent);
-        }
-        else if(Inst.equals("violin")){
-            Intent intent = new Intent(this,ViolinGenre.class);
-            startActivity(intent);
+      if(SuperInst!=null){
+          Log.d("DisplayTrackActivity","Null");
+
+          if( SuperInst.equals("Trance")){
+              Intent intent = new Intent(this,ElectronicGenre.class);
+              Log.d("DsiplayTrackActivity","going back to ElectronicGenre S "+SuperInst);
+              startActivity(intent);
+          }
+          else if(SuperInst.equals("guitar")){
+              Intent intent = new Intent(this,GuitarGenre.class);
+              Log.d("DsiplayTrackActivity","going back to GuitarGenre S "+SuperInst);
+              startActivity(intent);
+          }
+          else if(SuperInst.equals("violin")){
+              Intent intent = new Intent(this,ViolinGenre.class);
+              Log.d("DsiplayTrackActivity","going back to Violin S "+SuperInst);
+              startActivity(intent);
+
+          }
+          else if(SuperInst.equals("Sitar")){
+              Intent intent = new Intent(this,SitarGenre.class);
+              Log.d("DsiplayTrackActivity","going back to Sitar S"+SuperInst);
+              startActivity(intent);
+          }
+          else if(SuperInst.equals("Piano")){
+              Intent intent = new Intent(this,PianoGenre.class);
+              Log.d("DsiplayTrackActivity","going back to Piano S "+SuperInst);
+              startActivity(intent);
+          }
+      }
+        else{
+          Log.d("DisplayTrackActivity","Not null");
+          if(Inst.equals("Trance")){
+              Intent intent = new Intent(DisplayTrackActivity.this,ElectronicGenre.class);
+              Log.d("DsiplayTrackActivity","going back to ElectronicGenre "+Inst);
+              startActivity(intent);
+          }
+          else if(Inst.equals("guitar")){
+              Intent intent = new Intent(DisplayTrackActivity.this,GuitarGenre.class);
+              Log.d("DsiplayTrackActivity","going back to GuitarGenre "+Inst);
+              startActivity(intent);
+          }
+          else if(Inst.equals("violin")){
+              Intent intent = new Intent(DisplayTrackActivity.this,ViolinGenre.class);
+              Log.d("DsiplayTrackActivity","going back to Violin "+Inst);
+              startActivity(intent);
+
+          }
+          else if(Inst.equals("Sitar")){
+              Intent intent = new Intent(DisplayTrackActivity.this,SitarGenre.class);
+              Log.d("DsiplayTrackActivity","going back to Sitar "+Inst);
+
+              startActivity(intent);
+          }
+          else if(Inst.equals("Piano")){
+              Intent intent = new Intent(DisplayTrackActivity.this,PianoGenre.class);
+              Log.d("DsiplayTrackActivity","going back to Piano "+Inst);
+              startActivity(intent);
+          }
+      }
+
+
+//         Log.d("DisplayTrackActivity","The current Instrument "+Inst+" "+SuperInst);
+    }
+    public boolean DetectPlayer(){
+        Log.d("DisplayTrackActivity","detect player accesible");
+        if(musicSrv!=null)
+        {
+            return true;
 
         }
-        else if(Inst.equals("Sitar")){
-            Intent intent = new Intent(this,SitarGenre.class);
-            startActivity(intent);
-        }
+        else
+            return false;
+    }
+    public void StopPlaying(){
+        musicSrv.ResetPlayer();
+        stopService(playIntent);
+        onStop();
 
-       // Log.d("DisplayTrackActivity","The current Instrument "+Inst);
+
     }
     @Override
     public boolean onCreateOptionsMenu (Menu menu){
@@ -399,13 +523,24 @@ public class DisplayTrackActivity extends AppCompatActivity{
         }
         else if(id==R.id.playlist_item){
             Intent intent= new Intent(this,Playlist.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+@Override
 
+    public void onDataPass(List<Track> tracks){
+    mPlayListItems=tracks;
+}
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        SuperInst=intent.getStringExtra("Instrument");
+        Supercategory=intent.getStringExtra("Genre");
+
+    }
 
 }
-

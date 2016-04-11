@@ -1,8 +1,10 @@
 package com.kaidoh.mayuukhvarshney.gearjam;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,16 +13,20 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 /**
  * Created by mayuukhvarshney on 10/03/16.
  */
 public class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
     String ID,Title;
-    public DownloadFileFromURL(String trackID,String TL) // need to pass userID also along with this later..
+    Context mContext;
+    File Path;
+    public DownloadFileFromURL(Context context,String trackID,String TL,File folder) // need to pass userID also along with this later..
     {
         ID=trackID;
         Title=TL;
+        mContext=context;
+        Path=folder;
+
     }
 
     @Override
@@ -41,10 +47,10 @@ public class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
             int size = huc.getContentLength();
 
             if (huc != null) {
-                String fileName = Title+"["+ID+"]"+".mp3";
+                String fileName = Title+"<"+ID+">"+".mp3";
                 Log.d("whaterver",fileName);
-                String storagePath = Environment.getExternalStorageDirectory() +
-                        File.separator + "GearJam".toString();
+                String storagePath = Environment.getExternalStorageDirectory()+File.separator+"GearJam";
+
                 File f = new File(storagePath, fileName);
 
                 FileOutputStream fos = new FileOutputStream(f);
@@ -86,7 +92,9 @@ public class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
     @Override
     protected void onPostExecute(String file_url) {
 
-        Log.d("brooo","finished");
+        Toast.makeText(mContext,"Added To Playlist",Toast.LENGTH_SHORT).show();
+        Log.d("Download","Done");
+
     }
 
 

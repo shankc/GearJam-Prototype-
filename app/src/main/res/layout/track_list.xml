@@ -14,8 +14,8 @@
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-    <ListView
-        android:id="@+id/track_list_view"
+    <FrameLayout
+        android:id="@+id/FragmentContainer"
         android:layout_weight="100"
         android:layout_width="match_parent"
         android:background="@drawable/images4"
@@ -30,7 +30,7 @@
             android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
             android:layout_width="match_parent"
             android:layout_height="125dp"
-            >
+            android:layout_alignParentTop="true">
 
             <ImageView
                 android:id="@+id/selected_track_image"

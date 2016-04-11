@@ -1,3 +1,4 @@
+
 package com.kaidoh.mayuukhvarshney.gearjam;
 
 import android.content.Intent;
@@ -12,7 +13,7 @@ import android.widget.GridView;
  * Created by mayuukhvarshney on 05/03/16.
  */
 public class GuitarGenre  extends MainActivity{
-private static int[] ICONS={R.drawable.slash_rock,R.drawable.acoustic,R.drawable.geroge_benson_jazz,R.drawable.madonna_pop,R.drawable.dimebag_metal,R.drawable.clapton_instrumental,R.drawable.bb_king,R.drawable.folk_guitar};
+    private static int[] ICONS={R.drawable.slash_rock,R.drawable.acoustic,R.drawable.geroge_benson_jazz,R.drawable.madonna_pop,R.drawable.dimebag_metal,R.drawable.clapton_instrumental,R.drawable.bb_king,R.drawable.folk_guitar};
     private static String[] CONTENT={"Rock","Acoustic","Jazz","Pop","Metal","Instrumental","Blues","Folk"};
     private ImageAdapter GuitarimageAdapter;
     private GridView GuitarGrid;

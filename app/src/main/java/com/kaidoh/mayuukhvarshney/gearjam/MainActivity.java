@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.app.NotificationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -18,12 +19,12 @@ public class MainActivity extends AppCompatActivity{
     protected  GridView photoGrid;
     protected int mPhotoSize, mPhotoSpacing;
     protected ImageAdapter imageAdapter;
-
+protected NotificationManager manager;
    public static final int[] ICONS={R.drawable.jimmy_page,R.drawable.stirling,
 
-            R.drawable.hardwell,R.drawable.symphony,R.drawable.ravi_shankar,R.drawable.charlie_parker,R.drawable.piano,R.drawable.flute_player};
+            R.drawable.hardwell,R.drawable.piano,R.drawable.ravi_shankar,R.drawable.charlie_parker,R.drawable.symphony,R.drawable.flute_player};
 
-    public static final String[] CONTENT={"Guitar","Violin","Electronic","Symphony","Sitar","Saxophone","Piano","Flute"};
+    public static final String[] CONTENT={"Guitar","Violin","Electronic","Piano","Sitar","Saxophone","Symphony","Flute"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity{
                     Intent intent = new Intent(MainActivity.this, GuitarGenre.class);
                     startActivity(intent);
 
+
                 } else if (position == 1) {
                     Intent intent = new Intent(MainActivity.this, ViolinGenre.class);
                     startActivity(intent);
@@ -77,11 +79,15 @@ public class MainActivity extends AppCompatActivity{
                     startActivity(intent);
                 }
                 else if(position==3){
-
+                    Intent intent = new Intent(MainActivity.this,PianoGenre.class);
+                    startActivity(intent);
                 }
                 else if(position==4){
                     Intent intent = new Intent(MainActivity.this,SitarGenre.class);
                     startActivity(intent);
+                }
+                else if(position==6){
+
                 }
             }
         });
@@ -123,10 +129,21 @@ public class MainActivity extends AppCompatActivity{
         }
         else if(id==R.id.playlist_item){
             Intent intent= new Intent(this,Playlist.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public void onBackPressed(){
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+       intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);//***Change Here***
+        startActivity(intent);
+        finish();
+        System.exit(0);
     }
 
 

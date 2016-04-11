@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
     <application
+        android:name=".AppControl"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -13,7 +14,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,35 +24,57 @@
         </activity>
         <activity android:name=".GuitarGenre"
             android:label="GearJam"
+
             android:parentActivityName=".MainActivity">
 
         </activity>
         <activity android:name=".DisplayTrackActivity"
             android:label="GearJam"
-            android:parentActivityName=".GuitarGenre"
+            android:launchMode="singleInstance"
           >
 
         </activity>
         <activity android:name=".ViolinGenre"
                   android:parentActivityName=".MainActivity"
+            android:launchMode="singleInstance"
+
             >
 
         </activity>
         <activity android:name=".ElectronicGenre"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:launchMode="singleInstance"
+            >
 
         </activity>
         <activity android:name=".Playlist"
-            android:parentActivityName=".DisplayTrackActivity">
+            android:parentActivityName=".MainActivity"
+            android:launchMode="standard"
+            >
 
         </activity>
         <activity android:name=".SitarGenre"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:launchMode="singleInstance"
+            >
 
         </activity>
+        <activity android:name=".PianoGenre"
+                 android:parentActivityName=".MainActivity"
+            android:launchMode="singleInstance"
+
+            >
+
+        </activity>
+
+
         <service android:name=".MusicService"
                  android:enabled="true"
             >
+
+        </service>
+        <service android:name=".PlayListService"
+            android:enabled="true">
 
         </service>
 

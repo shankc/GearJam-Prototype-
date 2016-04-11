@@ -83,8 +83,8 @@ public class SitarGenre extends MainActivity {
     }
     @Override
     public void onBackPressed(){
-        //super.onBackPressed();
-        Intent intent = new Intent(this,MainActivity.class);
-        startActivity(intent);
+        super.onBackPressed();
+        //Intent intent = new Intent(this,MainActivity.class);
+        //startActivity(intent);
     }
 }

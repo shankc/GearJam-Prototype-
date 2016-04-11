@@ -5,96 +5,90 @@ package com.kaidoh.mayuukhvarshney.gearjam;
  */
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SeekBar;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import com.kaidoh.mayuukhvarshney.gearjam.PlayListService.MusicBinder;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
-
-public class Playlist  extends Activity {
+public class Playlist  extends AppCompatActivity implements PlayListFragment.PlayListPass {
     private SCTrackAdapter mAdapter;
+    public static Activity playlistactivity;
     private ListView listView,lv;
     private SeekBar mSeek_Bar;
-    private TextView mSelectedTrackTitle,mArtistTitile;
-    private ImageView mSelectedTrackImage,mPlayerControl;
+    protected TextView mSelectedTrackTitle,mArtistTitile;
+    protected ImageView mSelectedTrackImage,mPlayerControl;
     private int mediapos;
     private int mediamax;
-    private MediaPlayer mMediaPlayer;
     private boolean flag=false;
     private List<Track> mPlayListItems;
-private int Next_position=0;
+    private int Next_position=0;
     private int mark=0;
-    private List<String> SongPathList;
-   private  ArrayList<HashMap<String,String>>SongList;
+    protected LinkedHashMap<Integer,String> mIDs= new LinkedHashMap<>();
+    protected  ArrayList<LinkedHashMap<String,String>>SongList;
     private boolean Pause=false;
     private final Handler mHandler=new Handler();
     private boolean ConnectionFlag;
     private ListAdapter adapter;
+    protected Intent playIntent;
+    protected PlayListService musicSrv= new PlayListService();
+    private boolean musicBound=false;
+    private BroadcastReceiver mMessageReceiver;
+    private int Current_position=0;
+    protected DisplayTrackActivity display;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        playlistactivity=this;
         setContentView(R.layout.playlist_list);
-        ConnectivityManager cm =
-                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
+        AppControl app= (AppControl)getApplication();
+        app.play=this;
 
-       mMediaPlayer = new MediaPlayer();
-        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                flag = true;
-                //Log.d(TAG, "prep state" + flag);
-                togglePlayPause();
-                mediapos = mMediaPlayer.getCurrentPosition();
-                mediamax = mMediaPlayer.getDuration();
-                mSeek_Bar.setMax(mediamax);
-                mSeek_Bar.setProgress(mediapos);
-                mHandler.removeCallbacks(moveSeekBarThread);
-                mHandler.postDelayed(moveSeekBarThread, 100);
-            }
-        });
-        mPlayListItems= new ArrayList<Track>();
-        SongList= new ArrayList<HashMap<String,String>>();
-        listView = (ListView) findViewById(R.id.track_list_view);
-        mAdapter = new SCTrackAdapter(this, mPlayListItems);
+        AppControl appcontrolreverse= (AppControl)getApplication();
+        display=appcontrolreverse.Display;
+       // mPlayListItems= new ArrayList<Track>();
+        //SongList= new ArrayList<HashMap<String,String>>();
+        //listView = (ListView) findViewById(R.id.track_list_view);
+        //mAdapter = new SCTrackAdapter(this, mPlayListItems);
 
         //listView.setAdapter(adapter);
 
-        adapter = new SimpleAdapter(Playlist.this, SongList,
-                R.layout.playlist_item_offline, new String[] { "SongTitle" }, new int[] {
-                R.id.track_title});
-listView.setAdapter(adapter);
+       // adapter = new SimpleAdapter(Playlist.this, SongList,
+         //       R.layout.playlist_item_offline, new String[] { "SongTitle" }, new int[] {
+           //     R.id.track_title});
+        //listView.setAdapter(mAdapter);
+        PlayListFragment fragobj=new PlayListFragment();
+        Bundle bundle=new Bundle();
+        fragobj.setArguments(bundle);
+        FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.FragmentContainer, fragobj);
+        ft.addToBackStack(null);
+        ft.commit();
 
         mSeek_Bar = (SeekBar) findViewById(R.id.seek_bar);
-         mSeek_Bar.setMax(mMediaPlayer.getDuration());
         mSelectedTrackTitle = (TextView) findViewById(R.id.selected_track_title);
         mSelectedTrackImage = (ImageView) findViewById(R.id.selected_track_image);
         mPlayerControl = (ImageView) findViewById(R.id.player_control);
@@ -103,119 +97,59 @@ listView.setAdapter(adapter);
         mSelectedTrackImage.setImageResource(R.drawable.waiting_image);
         Sc_icon.setImageResource(R.drawable.logo_sc_white);
 
-        SongPathList=new ArrayList<>();
-        File home = new File("/sdcard/GearJam/");
-        SCTrackService trackService= SoundCloud.getTrackService();
-
-        if (home.listFiles(new FileExtensionFilter()).length > 0) {
-            for (File file : home.listFiles(new FileExtensionFilter())) {
-               HashMap<String,String> song= new HashMap<>();
-                song.put("SongTitle", file.getName().substring(0, findbracket(file.getName())));
-                song.put("SongPath",file.getPath());
-                String txt=file.getName().substring(0,findbracket(file.getName()));
-                SongList.add(song);
-                int temp1=convert(filter(file.getName()));
-                final String temp=file.getPath();
-                trackService.getTrack(temp1, new Callback<Track>() {
-                    @Override
-                    public void success(Track track, Response response) {
-                        mPlayListItems.add(track);
-
-                        SongPathList.add(temp);
-                        mAdapter.notifyDataSetChanged();
-
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-
-                        Toast.makeText(Playlist.this, "Network Error ArtWork couldn't be Loaded :(", Toast.LENGTH_SHORT).show();
-                        ConnectionFlag = true;
-
-
-                    }
-
-                });
-
-            }
-
-
-        }
+        //SongPathList=new ArrayList<>();
         mPlayerControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                togglePlayPause();
+                Toggle();
             }
         });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //  Next_position=position;
-                //Track track = .get(position);
-                String path = SongList.get(position).get("SongPath");
-                Log.d("This","path"+path);
-                // MediaPlayer mp=new MediaPlayer();
-                //mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                mSelectedTrackTitle.setText(SongList.get(position).get("SongTitle"));
-              //  mArtistTitile.setText(track.getUser().getUsername());
-                //if (//track.getArtworkURL() != null) {
-                    //Picasso.with(Playlist.this).load(track.getArtworkURL()).into(mSelectedTrackImage);
-                 //else
-                // {
-                    mSelectedTrackImage.setImageResource(R.drawable.waiting_image);
+            mMessageReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
 
+                    Bundle extras = intent.getExtras();
+                    int index = extras.getInt("Current");
+                    Log.d("PlayList", "the index" + index);
 
-
-
-                if (mMediaPlayer.isPlaying()) {
-                    mMediaPlayer.stop();
-                    mMediaPlayer.reset();
-                    flag = false;
-                } else {
-
-                    if (Pause && flag) {
-                        mMediaPlayer.stop();
-                        mMediaPlayer.reset();
-                        flag = false;
+                    if (Current_position != index) {
+                        Track track = mPlayListItems.get(index);
+                        //mSelectedTrackTitle.setText(SongList.get(index).get("SongTitle"));
+                        mSelectedTrackTitle.setText(track.getTitle());
+                        mArtistTitile.setText(track.getUser().getUsername());
+                        Picasso.with(Playlist.this).load(track.getArtworkURL()).into(mSelectedTrackImage);
 
                     }
-                }
-
-                try {
-
-                    mMediaPlayer.setDataSource(path);
-                    mMediaPlayer.prepareAsync();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    ToggleSwitch();
+                    SeekInit();
 
                 }
-                Next_position = position + 1;
-            }
-        });
-
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mPlayerControl.setImageResource(R.drawable.ic_play_circle_filled_white_24dp);
-
-                if (flag) {
-                    gotoNextTrack();
-                }
+            };
+        }
 
 
-            }
-        });
 
+
+
+    private void SeekInit() {
+        if (musicSrv.isPng()) {
+            mediapos = musicSrv.getPosn();
+            mediamax = musicSrv.getDur();
+            mSeek_Bar.setMax((int) mediamax);
+            mSeek_Bar.setProgress((int) mediapos);
+            mHandler.removeCallbacks(moveSeekBarThread);
+            mHandler.postDelayed(moveSeekBarThread, 100);
+
+        }
     }
 
     private Runnable moveSeekBarThread=new Runnable() {
         @Override
         public void run() {
-            if(mMediaPlayer.isPlaying()){
-                int newmediapos=mMediaPlayer.getCurrentPosition();
-                int newmediamax=mMediaPlayer.getDuration();
+            if(musicSrv.isPng()){
+                int newmediapos=musicSrv.getPosn();
+                int newmediamax=musicSrv.getDur();
                 mSeek_Bar.setMax(newmediamax);
                 mSeek_Bar.setProgress(newmediapos);
                 mHandler.postDelayed(this,100);
@@ -224,108 +158,138 @@ listView.setAdapter(adapter);
     };
 
 
-    private void togglePlayPause() {
-        if (mMediaPlayer.isPlaying()) {
-            mMediaPlayer.pause();
+    private void Toggle() {
+        if (musicSrv.isPng()) {
+            musicSrv.pausePlayer();
             Pause=true;
             mPlayerControl.setImageResource(R.drawable.ic_play_circle_filled_white_24dp);
         } else {
-            if(flag) {
-                mMediaPlayer.start();
-                Pause = false;
-                mPlayerControl.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp);
-            }
+
+            musicSrv.go();
+            Pause = false;
+            mPlayerControl.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp);
+
         }
+        musicSrv.PauseState(Pause);
     }
 
-    private void gotoNextTrack(){
-        //  Next_position++;
-        flag=false;
-        Track next_track=mPlayListItems.get(Next_position);
-        String path=SongList.get(Next_position).get("SongPath");
-        mSelectedTrackTitle.setText(next_track.getTitle());
-        //Picasso.with(Playlist.this).load(next_track.getArtworkURL()).into(mSelectedTrackImage);
-        mSeek_Bar.setProgress(0);
-
-        mMediaPlayer.reset();
-
-        try{
-
-            mMediaPlayer.setDataSource(path);
-            mMediaPlayer.prepareAsync();
-
+    public void ToggleSwitch() {
+        if(musicSrv.isPng()) {
+            mPlayerControl.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp);
+        }
+        else
+        {
+            mPlayerControl.setImageResource(R.drawable.ic_play_circle_filled_white_24dp);
         }
 
-        catch(Exception e){
-            e.printStackTrace();
-            Log.e(" ","error is " + e);
-        }
 
-        Next_position++;
     }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        if (mMediaPlayer != null) {
-            if (mMediaPlayer.isPlaying()) {
-                mMediaPlayer.stop();
-            }
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
+        stopService(playIntent);
+        //musicSrv.onUnbind(playIntent);
+        musicSrv=null;
+
+       // unbindService(musicConnection);
+    }
+    @Override
+    public void onBackPressed(){
+        Intent intent=new Intent(this,MainActivity.class);
+        startActivity(intent);
     }
     @Override
     protected void onPause(){
         super.onPause();
-        mMediaPlayer.pause();
+        Log.d("PlayList", "pause state reached ");
+      if(musicSrv!=null)
+      {
+          Log.d("PlayList","Music service not null");
+      }
+else
+      {
+          Log.d("Playlist", "Music Servide null");
+      }
     }
     @Override
     protected void onResume(){
         super.onResume();
-        if(!mMediaPlayer.isPlaying())
-        {
-            mMediaPlayer.start();
-        }
-    }
-    class FileExtensionFilter implements FilenameFilter {
-        public boolean accept(File dir, String name) {
-            return (name.endsWith(".mp3") || name.endsWith(".MP3"));
-        }
-    }
-    public String filter(String txt){
+       if(musicBound)
+       {
 
-        for(int i=0;i<txt.length();i++)
-        {
-            if(txt.charAt(i)=='[' ){
-                mark = i;
-                break;
-            }
+
+
+       }
+        if (Pause) {
+
+            Pause = false;
+            musicSrv.PauseState(Pause);
+
         }
-        int start=mark+1;
-        StringBuilder ID=new StringBuilder();
-        while(txt.charAt(start)!=']')
-        {
-            ID.append(txt.charAt(start));
-            start++;
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter("Prep"));
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        if(playIntent==null){
+            playIntent = new Intent(this, PlayListService.class);
+            //  playIntent.putExtra("M",new Messenger(messageHandler));
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            startService(playIntent);
+        }
+    }
+
+    protected ServiceConnection musicConnection = new ServiceConnection(){
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicBinder binder=(MusicBinder) service;
+            //get service
+            musicSrv = binder.getService();
+            //pass list
+            musicSrv.setList(SongList);
+            musicSrv.setTrackList(mPlayListItems);
+            musicSrv.setIDS(mIDs);
+            musicBound = true;
         }
 
-        return ID.toString();
-    }
-    public int findbracket(String txt){
-         int flag=0;
-        for(int i=0;i<txt.length();i++)
-        {
-            if(txt.charAt(i)=='['){
-                flag=i;
-                break;
-            }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicBound = false;
+
         }
-        return flag;
+
+    };
+    public boolean Detectplayer(){
+        if(musicSrv!=null)
+        {
+            return true;
+        }
+        return false;
     }
-    public int convert(String s){
-        int foo=Integer.parseInt(s);
-        return foo;
+    public void StopPlaying()
+    {
+       musicSrv.stop();
+
+        stopService(playIntent);
+        onStop();
+        //musicSrv.onUnbind(playIntent);
+
+       // Log.d("stopplaying "," it is really showing!!");
+
     }
+    @Override
+    public void onPlayListPass(ArrayList<LinkedHashMap<String,String>> tracks,List<Track> Songs,LinkedHashMap<Integer,String> IDS){
+        SongList=tracks;
+        mPlayListItems=Songs;
+        mIDs=IDS;
+    }
+
+
 }
+

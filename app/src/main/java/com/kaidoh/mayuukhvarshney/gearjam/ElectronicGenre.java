@@ -38,6 +38,7 @@ public class ElectronicGenre extends MainActivity {
             } else if (position == 1) {
                 intent.putExtra("Instrument", "Trance");
                 intent.putExtra("Genre", "Edm");
+                //intent.addFlags()
                 startActivity(intent);
             } else if (position == 2) {    // since URL format may replace the space with underscore. applies to all genres
                 intent.putExtra("Instrument", "Trance");
@@ -84,7 +85,7 @@ public class ElectronicGenre extends MainActivity {
 }
     @Override
     public void onBackPressed(){
-        //super.onBackPressed();
+        super.onBackPressed();
         Intent intent = new Intent(this,MainActivity.class);
         startActivity(intent);
     }

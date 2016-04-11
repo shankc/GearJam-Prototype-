@@ -172,10 +172,6 @@ public void playSong(){
     public long getPosn(){
         return exoPlayer.getCurrentPosition();
     }
-    public void StopPlayer(){
-        exoPlayer.stop();
-        exoPlayer.seekTo(0);
-    }
     public boolean PrepState(){
         return this.PrepStage;
     }

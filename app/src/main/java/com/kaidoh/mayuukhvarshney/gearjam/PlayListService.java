@@ -4,6 +4,7 @@ package com.kaidoh.mayuukhvarshney.gearjam;
  * Created by mayuukhvarshney on 15/03/16.
  */
 
+
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -16,28 +17,25 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
-import com.google.android.exoplayer.ExoPlayer;
+import android.widget.ImageView;
+import android.widget.SeekBar;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Random;
-
-/*
- * This is demo code to accompany the Mobiletuts+ series:
- * Android SDK: Creating a Music Player
- *
- * Sue Smith - February 2014
- */
+import java.util.List;
 
 public class PlayListService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
 
     //media player
-
+    private ImageView mPlayerControl;
+    private SeekBar mSeek_Bar;
     public MediaPlayer player;
     //song list
-    private ArrayList<String> songs;
+    private ArrayList<LinkedHashMap<String,String>> songs;
+    private List<Track> TrackList;
     //current position
     private int songPosn;
     private boolean PrepStage=false;
@@ -53,10 +51,8 @@ public class PlayListService extends Service implements
     public boolean pause;
     private final Handler handler=new Handler();
     Intent intent;
-    private ExoPlayer exoPlayer;
-    private ArrayList<String> path;
-    private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
-    private static final int BUFFER_SEGMENT_COUNT = 256;
+    protected LinkedHashMap<Integer,String> theIDs= new LinkedHashMap<>();
+
     public void onCreate(){
         //create the service
         super.onCreate();
@@ -69,10 +65,8 @@ public class PlayListService extends Service implements
         player = new MediaPlayer();
         intent = new Intent();
         //initialize
+
         initMusicPlayer();
-
-
-
 
     }
 
@@ -86,13 +80,25 @@ public class PlayListService extends Service implements
         player.setOnCompletionListener(this);
         player.setOnErrorListener(this);
     }
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
 
-    private Runnable SendUpdates;
+        //Do what you need in onStartCommand when service has been started
+        //Bundle extras= intent.getExtras();
+        player.stop();
+        player.reset();
 
+        return START_NOT_STICKY;
+    }
     //pass song list
-    public void setList(ArrayList<String> theSongs){
+    public void setList(final ArrayList<LinkedHashMap<String,String>> theSongs){
         songs=theSongs;
     }
+    public void setTrackList(List<Track> tracks){
+
+        TrackList=tracks;
+    }
+
 
 
     //binder
@@ -100,7 +106,6 @@ public class PlayListService extends Service implements
         PlayListService getService() {
             return PlayListService.this;
         }
-
     }
 
     //activity will bind to service
@@ -118,7 +123,7 @@ public class PlayListService extends Service implements
     }
 
     //play a song
-    public void playSong(String uri){
+    public void playSong(){
         //play
         if(player.isPlaying())
         {
@@ -131,21 +136,25 @@ public class PlayListService extends Service implements
         {
             if(PrepStage && pause)
 
-            {   player.reset();
+            {  player.stop();
+                player.reset();
                 PrepStage=false;
             }
         }
-
         //get song
-        songTitle= songs.get(songPosn);
+
         //get title
-          //get id
+         //songTitle=songs.get(songPosn).get("SongTitle");
+        Track track = new Track();
+         track= TrackList.get(songPosn);
+        songTitle=track.getTitle();
+        //get id
         // long currSong = playSong.getID();
         //set uri
 
         //set the data source
           try{
-            player.setDataSource(uri);
+            player.setDataSource(theIDs.get(track.getID()));
         }
         catch(Exception e){
           Log.e("MUSIC SERVICE", "Error setting data source", e);
@@ -159,11 +168,24 @@ public class PlayListService extends Service implements
 
     //set the song
     public void setSong(int songIndex){
-        songPosn=songIndex;
+songPosn=songIndex;
 
+
+    }
+    public void setIDS(LinkedHashMap<Integer,String> IDS){
+        theIDs=IDS;
     }
     public int getSongIndex(){
         return songPosn;
+    }
+    public void TestMethod(){
+      if(theIDs!=null){
+          Log.d("PlayListService ","Map sent and recieved");
+      }
+        else
+      {
+          Log.d("PlayListService","Unsuccesful map not recived");
+      }
     }
     @Override
     public void  onCompletion(MediaPlayer mp) {
@@ -173,7 +195,6 @@ public class PlayListService extends Service implements
             playNext();
         }
     }
-
 
 
 
@@ -191,62 +212,63 @@ public class PlayListService extends Service implements
         send();
         mp.start();
         //notification
-        Intent notIntent = new Intent(this, MainActivity.class);
-        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendInt = PendingIntent.getActivity(this, 0,
-                notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent notIntent = new Intent(PlayListService.this, Playlist.class);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+        //notIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        Notification.Builder builder = new Notification.Builder(this);
+        PendingIntent pendInt = PendingIntent.getActivity(PlayListService.this, PendingIntent.FLAG_CANCEL_CURRENT,
+                notIntent, 0);
+        // PendingIntent pendInt= PendingIntent.getActivity(MusicService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+        //  PendingIntent pendInt = PendingIntent.getActivity(MusicService.this,0,intent,0);
+
+        Notification.Builder builder = new Notification.Builder(PlayListService.this);
 
         builder.setContentIntent(pendInt)
                 .setSmallIcon(R.drawable.ic_play_circle_filled_white_24dp)
                 .setTicker(songTitle)
                 .setOngoing(true)
-                .setContentTitle("Now Playing")
-                .setContentText(songTitle)
-                .setAutoCancel(true);
-
+                .setContentTitle("Playing")
+                .setContentText(songTitle);
         Notification not = builder.build();
         startForeground(NOTIFY_ID, not);
-    }
+
+
+}
 
 
     //playback methods
-    public long getPosn(){
-        return exoPlayer.getCurrentPosition();
-    }
-    public void StopPlayer(){
-        player.stop();
+    public int getPosn(){
+        return player.getCurrentPosition();
     }
     public boolean PrepState(){
         return PrepStage;
     }
-    public long getDur(){
-        return exoPlayer.getDuration();
+    public int getDur(){
+        return player.getDuration();
     }
 
     public boolean isPng(){
-        return exoPlayer.getPlayWhenReady();
+        return player.isPlaying();
     }
 
     public void pausePlayer(){
-        exoPlayer.setPlayWhenReady(false);
+       player.pause();
     }
 
-    public void seek(int posn){
-        player.seekTo(posn);
-    }
+
 
     public void go(){
-        exoPlayer.setPlayWhenReady(true);
+        player.start();
+    }
+
+    public void stop(){
+        player.stop();
+        player.reset();
     }
 
     //skip to previous track
     public void PauseState(boolean Pause_state){
         pause=Pause_state;
-    }
-    public void Paths(ArrayList<String> thepaths){
-        path=thepaths;
     }
 
 
@@ -257,8 +279,7 @@ public class PlayListService extends Service implements
             if(songPosn>=songs.size()) songPosn=0;
         }
         PrepStage=false;
-
-        playSong(path.get(songPosn));
+        playSong();
     }
     private void States(){
         intent.putExtra("Stage",PrepStage);
@@ -267,7 +288,7 @@ public class PlayListService extends Service implements
     }
     private void send(){
         Intent intent= new Intent("Prep");
-        intent.putExtra("message","get this shit over already");
+        intent.putExtra("Current",songPosn);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
     @Override
@@ -276,6 +297,5 @@ public class PlayListService extends Service implements
     }
 
 
-    //toggle shuffle
 
 }

@@ -1,0 +1,21 @@
+package com.kaidoh.mayuukhvarshney.gearjam;
+
+import android.content.Intent;
+import android.view.View;
+import android.app.Application;
+/**
+ * Created by mayuukhvarshney on 01/04/16.
+ */
+public class AppControl extends Application {
+    private static AppControl mInstance;
+    Playlist play;
+    DisplayTrackActivity Display;
+    public static synchronized AppControl getInstance() {
+        return mInstance;
+    }
+
+
+    public void stopService(View view) {
+        stopService(new Intent(getBaseContext(), PlayListService.class));
+    }
+}
