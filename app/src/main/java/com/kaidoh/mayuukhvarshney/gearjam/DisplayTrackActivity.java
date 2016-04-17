@@ -232,14 +232,20 @@ public class DisplayTrackActivity extends AppCompatActivity implements SongList.
 
     // methods for seekbar.
     private void SeekInit() {
-        if (musicSrv.isPng()) {
-            mediapos = musicSrv.getPosn();
-            mediamax = musicSrv.getDur();
-            mSeek_Bar.setMax((int) mediamax);
-            mSeek_Bar.setProgress((int) mediapos);
-            mHandler.removeCallbacks(moveSeekBarThread);
-            mHandler.postDelayed(moveSeekBarThread, 100);
+        if(musicSrv!=null) {
+            if (musicSrv.isPng()) {
+                mediapos = musicSrv.getPosn();
+                mediamax = musicSrv.getDur();
+                mSeek_Bar.setMax((int) mediamax);
+                mSeek_Bar.setProgress((int) mediapos);
+                mHandler.removeCallbacks(moveSeekBarThread);
+                mHandler.postDelayed(moveSeekBarThread, 100);
 
+            }
+        }
+        else
+        {
+            Log.d("DisplayTrackAcivity","Came Crashing here in seekint"+musicBound);
         }
     }
 
@@ -248,12 +254,18 @@ public class DisplayTrackActivity extends AppCompatActivity implements SongList.
     private Runnable moveSeekBarThread=new Runnable() {
         @Override
         public void run() {
-            if(musicSrv.isPng()){
-                long newmediapos=musicSrv.getPosn();
-                long newmediamax=musicSrv.getDur();
-                mSeek_Bar.setMax((int)newmediamax);
-                mSeek_Bar.setProgress((int)newmediapos);
-                mHandler.postDelayed(this,100);
+            if(musicSrv!=null) {
+                if (musicSrv.isPng()) {
+                    long newmediapos = musicSrv.getPosn();
+                    long newmediamax = musicSrv.getDur();
+                    mSeek_Bar.setMax((int) newmediamax);
+                    mSeek_Bar.setProgress((int) newmediapos);
+                    mHandler.postDelayed(this, 100);
+                }
+            }
+            else
+            {
+                Log.d("DisplayTrackActivity","Crashing here run"+musicBound );
             }
         }
     };
@@ -426,22 +438,26 @@ public class DisplayTrackActivity extends AppCompatActivity implements SongList.
 
           if( SuperInst.equals("Trance")){
               Intent intent = new Intent(this,ElectronicGenre.class);
+
               Log.d("DsiplayTrackActivity","going back to ElectronicGenre S "+SuperInst);
               startActivity(intent);
           }
           else if(SuperInst.equals("guitar")){
               Intent intent = new Intent(this,GuitarGenre.class);
+
               Log.d("DsiplayTrackActivity","going back to GuitarGenre S "+SuperInst);
               startActivity(intent);
           }
           else if(SuperInst.equals("violin")){
               Intent intent = new Intent(this,ViolinGenre.class);
+
               Log.d("DsiplayTrackActivity","going back to Violin S "+SuperInst);
               startActivity(intent);
 
           }
           else if(SuperInst.equals("Sitar")){
               Intent intent = new Intent(this,SitarGenre.class);
+
               Log.d("DsiplayTrackActivity","going back to Sitar S"+SuperInst);
               startActivity(intent);
           }
@@ -455,28 +471,33 @@ public class DisplayTrackActivity extends AppCompatActivity implements SongList.
           Log.d("DisplayTrackActivity","Not null");
           if(Inst.equals("Trance")){
               Intent intent = new Intent(DisplayTrackActivity.this,ElectronicGenre.class);
+
               Log.d("DsiplayTrackActivity","going back to ElectronicGenre "+Inst);
               startActivity(intent);
           }
           else if(Inst.equals("guitar")){
               Intent intent = new Intent(DisplayTrackActivity.this,GuitarGenre.class);
+
               Log.d("DsiplayTrackActivity","going back to GuitarGenre "+Inst);
               startActivity(intent);
           }
           else if(Inst.equals("violin")){
               Intent intent = new Intent(DisplayTrackActivity.this,ViolinGenre.class);
+
               Log.d("DsiplayTrackActivity","going back to Violin "+Inst);
               startActivity(intent);
 
           }
           else if(Inst.equals("Sitar")){
               Intent intent = new Intent(DisplayTrackActivity.this,SitarGenre.class);
+
               Log.d("DsiplayTrackActivity","going back to Sitar "+Inst);
 
               startActivity(intent);
           }
           else if(Inst.equals("Piano")){
               Intent intent = new Intent(DisplayTrackActivity.this,PianoGenre.class);
+
               Log.d("DsiplayTrackActivity","going back to Piano "+Inst);
               startActivity(intent);
           }

@@ -7,6 +7,7 @@ package com.kaidoh.mayuukhvarshney.gearjam;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
@@ -34,26 +35,32 @@ public class SitarGenre extends MainActivity {
                 if (position == 0) {
                     intent.putExtra("Instrument", "Sitar");
                     intent.putExtra("Genre", "World");
+
                     startActivity(intent);
                 } else if (position == 1) {
                     intent.putExtra("Instrument", "Sitar");
                     intent.putExtra("Genre", "Electronic");
+
                     startActivity(intent);
                 } else if (position == 2) {
                     intent.putExtra("Instrument", "Sitar");
                     intent.putExtra("Genre", "Rock");
+
                     startActivity(intent);
                 } else if (position == 3) {
                     intent.putExtra("Instrument", "Sitar");
                     intent.putExtra("Genre", "Instrumental");
+
                     startActivity(intent);
                 } else if (position == 4) {
                     intent.putExtra("Instrument", "Sitar");
                     intent.putExtra("Genre", "Fusion");
+
                     startActivity(intent);
                 } else if (position == 5) {
                     intent.putExtra("Instrument", "Sitar");
                     intent.putExtra("Genre", "World music");
+
                     startActivity(intent);
                 } else if (position == 6) {
                     intent.putExtra("Instrument", "Sitar");
@@ -82,9 +89,14 @@ public class SitarGenre extends MainActivity {
         });
     }
     @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d("ElectronicGenere", "has come to onResume State");
+    }
+    @Override
     public void onBackPressed(){
-        super.onBackPressed();
-        //Intent intent = new Intent(this,MainActivity.class);
-        //startActivity(intent);
+        //super.onBackPressed();
+        Intent intent = new Intent(this,MainActivity.class);
+        startActivity(intent);
     }
 }

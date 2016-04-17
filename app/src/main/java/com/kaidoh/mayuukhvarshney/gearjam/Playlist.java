@@ -45,7 +45,7 @@ public class Playlist  extends AppCompatActivity implements PlayListFragment.Pla
     private List<Track> mPlayListItems;
     private int Next_position=0;
     private int mark=0;
-    protected LinkedHashMap<Integer,String> mIDs= new LinkedHashMap<>();
+    protected LinkedHashMap<Integer,String> mIDs;
     protected  ArrayList<LinkedHashMap<String,String>>SongList;
     private boolean Pause=false;
     private final Handler mHandler=new Handler();
@@ -80,6 +80,7 @@ public class Playlist  extends AppCompatActivity implements PlayListFragment.Pla
          //       R.layout.playlist_item_offline, new String[] { "SongTitle" }, new int[] {
            //     R.id.track_title});
         //listView.setAdapter(mAdapter);
+
         PlayListFragment fragobj=new PlayListFragment();
         Bundle bundle=new Bundle();
         fragobj.setArguments(bundle);
@@ -111,8 +112,6 @@ public class Playlist  extends AppCompatActivity implements PlayListFragment.Pla
 
                     Bundle extras = intent.getExtras();
                     int index = extras.getInt("Current");
-                    Log.d("PlayList", "the index" + index);
-
                     if (Current_position != index) {
                         Track track = mPlayListItems.get(index);
                         //mSelectedTrackTitle.setText(SongList.get(index).get("SongTitle"));
@@ -217,12 +216,17 @@ else
     @Override
     protected void onResume(){
         super.onResume();
-       if(musicBound)
-       {
+        if(musicBound)
+        {
+            onStart();
+            PlayListFragment fragobj=new PlayListFragment();
+            FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.FragmentContainer, fragobj);
+            ft.addToBackStack(null);
+            ft.commit();
 
 
-
-       }
+        }
         if (Pause) {
 
             Pause = false;
@@ -236,6 +240,7 @@ else
     @Override
     protected void onStart(){
         super.onStart();
+
         if(playIntent==null){
             playIntent = new Intent(this, PlayListService.class);
             //  playIntent.putExtra("M",new Messenger(messageHandler));
@@ -285,8 +290,12 @@ else
     }
     @Override
     public void onPlayListPass(ArrayList<LinkedHashMap<String,String>> tracks,List<Track> Songs,LinkedHashMap<Integer,String> IDS){
+        //SongList=new ArrayList<>();
         SongList=tracks;
+        //mPlayListItems= new ArrayList<>();
+
         mPlayListItems=Songs;
+        //mIDs= new LinkedHashMap<>();
         mIDs=IDS;
     }
 

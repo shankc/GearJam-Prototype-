@@ -25,7 +25,9 @@
         <activity android:name=".GuitarGenre"
             android:label="GearJam"
 
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+
+            >
 
         </activity>
         <activity android:name=".DisplayTrackActivity"
@@ -36,32 +38,34 @@
         </activity>
         <activity android:name=".ViolinGenre"
                   android:parentActivityName=".MainActivity"
-            android:launchMode="singleInstance"
+
+
 
             >
 
         </activity>
         <activity android:name=".ElectronicGenre"
             android:parentActivityName=".MainActivity"
-            android:launchMode="singleInstance"
+
+
             >
 
         </activity>
         <activity android:name=".Playlist"
             android:parentActivityName=".MainActivity"
-            android:launchMode="standard"
             >
 
         </activity>
         <activity android:name=".SitarGenre"
             android:parentActivityName=".MainActivity"
-            android:launchMode="singleInstance"
+
+
             >
 
         </activity>
         <activity android:name=".PianoGenre"
                  android:parentActivityName=".MainActivity"
-            android:launchMode="singleInstance"
+
 
             >
 

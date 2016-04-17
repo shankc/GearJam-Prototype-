@@ -17,11 +17,9 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import java.util.Collections;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -37,7 +35,9 @@ public class PlayListFragment extends Fragment {
     private SCTrackAdapter mAdapter;
     protected  ArrayList<LinkedHashMap<String,String>>SongList;
     protected  ArrayList<LinkedHashMap<String,String>> PlayListSongs;
-    protected LinkedHashMap<Integer,String> IDS= new LinkedHashMap<>();
+    protected LinkedHashMap<Integer,String> IDS;
+    protected int tempID;
+    protected String tempPath;
     private int Current_position=0;
    PlayListPass data;
     @Override
@@ -48,6 +48,7 @@ public class PlayListFragment extends Fragment {
         mPlayListItems = new ArrayList<Track>();
         TempArray= new ArrayList<Track>();
         SongList = new ArrayList<LinkedHashMap<String, String>>();
+        IDS= new LinkedHashMap<>();
         listView = (ListView) view.findViewById(R.id.song_list_view);
         mAdapter = new SCTrackAdapter(getActivity(), mPlayListItems);
         listView.setAdapter(mAdapter);
@@ -56,6 +57,7 @@ public class PlayListFragment extends Fragment {
         if (home.listFiles() == null) {
             Toast.makeText(getActivity(), "No Songs in PlayList :(", Toast.LENGTH_SHORT).show();
         } else {
+
             if (home.listFiles(new FileExtensionFilter()).length > 0) {
                 for (File file : home.listFiles(new FileExtensionFilter())) {
                     LinkedHashMap<String, String> song = new LinkedHashMap<>();
@@ -64,14 +66,15 @@ public class PlayListFragment extends Fragment {
                     song.put("SongPath", file.getPath());
                     String txt = file.getName().substring(0, findbracket(file.getName()));
                     SongList.add(song);
-                    final int temp1 = convert(filter(file.getName()));
-                    final String temp = file.getPath();
-                    trackService.getTrack(temp1, new Callback<Track>() {
+                     tempID= convert(filter(file.getName()));
+                     tempPath = file.getPath();
+                    IDS.put(tempID,tempPath);
+                    trackService.getTrack(tempID, new Callback<Track>() {
                         @Override
                         public void success(Track track, Response response) {
                            mPlayListItems.add(track);
-                           IDS.put(track.getID(),temp);
-                           // ((Playlist)getActivity()).musicSrv.TestMethod();
+                           //IDS.put(track.getID(),tempPath);
+                           //((Playlist)getActivity()).musicSrv.TestMethod();
                             mAdapter.notifyDataSetChanged();
 
 
@@ -79,7 +82,7 @@ public class PlayListFragment extends Fragment {
 
                         @Override
                         public void failure(RetrofitError error) {
-
+                            Log.d("PLayListFragment","retrofit error ",error);
                             Toast.makeText(getActivity(), "Network Error ArtWork couldn't be Loaded :(", Toast.LENGTH_SHORT).show();
 
 
@@ -91,15 +94,9 @@ public class PlayListFragment extends Fragment {
                 }
 
 
-                Collections.sort(mPlayListItems, new Comparator<Track>() {
-                    @Override
-                    public int compare(Track lhs, Track rhs) {
-                        return lhs.getTitle().compareTo(rhs.getTitle());
-                    }
 
-                });
+
             }
-
 
 
             data.onPlayListPass(SongList, mPlayListItems, IDS);
@@ -112,11 +109,16 @@ public class PlayListFragment extends Fragment {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     if (((Playlist)getActivity()).display != null) {
                         if (((Playlist)getActivity()).display.DetectPlayer()) {
+                            Log.d("PlayListFragment"," coming inside the if method ");
                             ((Playlist)getActivity()).display.StopPlaying();
                         }
                     }
                     ((Playlist)getActivity()).musicSrv.setSong(position);
                     Track track = mPlayListItems.get(position);
+                    if(position==0)
+                    {
+                        Log.d("PlayListFragment","the song path "+IDS.get(track.getID()));
+                    }
                  //   ((Playlist)getActivity()).musicSrv.setSong(track.getTitle());
 
                     Current_position = position;
@@ -124,8 +126,7 @@ public class PlayListFragment extends Fragment {
                     //mSelectedTrackImage.setImageResource(R.drawable.waiting_image);
                     ((Playlist)getActivity()).mSelectedTrackTitle.setText(track.getTitle());
                     ((Playlist)getActivity()).mArtistTitile.setText(track.getUser().getUsername());
-                    Picasso.with(getActivity()).load(track.getArtworkURL()).into(((Playlist)getActivity()).mSelectedTrackImage);
-                    Log.d("PlayList", "the current Song " + track.getTitle());
+                    Picasso.with(getActivity()).load(track.getArtworkURL()).into(((Playlist) getActivity()).mSelectedTrackImage);
                     ((Playlist)getActivity()).musicSrv.playSong();
                 }
             });

@@ -6,6 +6,7 @@ package com.kaidoh.mayuukhvarshney.gearjam;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
@@ -31,34 +32,42 @@ public class PianoGenre extends MainActivity {
                 if (position == 0) {
                     intent.putExtra("Instrument", "Piano");
                     intent.putExtra("Genre", "Classical");
+
                     startActivity(intent);
                 } else if (position == 1) {
                     intent.putExtra("Instrument", "Piano");
                     intent.putExtra("Genre", "Jazz");
+
                     startActivity(intent);
                 } else if (position == 2) {
                     intent.putExtra("Instrument", "Piano");
                     intent.putExtra("Genre", "Instrumental");
+
                     startActivity(intent);
                 } else if (position == 3) {
                     intent.putExtra("Instrument", "Piano");
                     intent.putExtra("Genre", "Pop");
+
                     startActivity(intent);
                 } else if (position == 4) {
                     intent.putExtra("Instrument", "Piano");
                     intent.putExtra("Genre", "Soundtrack");
+
                     startActivity(intent);
                 } else if (position == 5) {
                     intent.putExtra("Instrument", "Piano");
                     intent.putExtra("Genre", "Hip hop");
+
                     startActivity(intent);
                 } else if (position == 6) {
                     intent.putExtra("Instrument", "Piano");
                     intent.putExtra("Genre", "Electronic");
+
                     startActivity(intent);
                 } else if (position == 7) {
                     intent.putExtra("Instrument", "Piano");
                     intent.putExtra("Genre", "Piano");
+
                     startActivity(intent);
                 }
 
@@ -79,6 +88,11 @@ public class PianoGenre extends MainActivity {
                 }
             }
         });
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d("ElectronicGenere", "has come to onResume State");
     }
     @Override
     public void onBackPressed(){

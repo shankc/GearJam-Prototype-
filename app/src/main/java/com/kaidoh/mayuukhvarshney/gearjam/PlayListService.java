@@ -3,9 +3,7 @@ package com.kaidoh.mayuukhvarshney.gearjam;
 /**
  * Created by mayuukhvarshney on 15/03/16.
  */
-
-
-import android.app.Notification;
+        import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -17,21 +15,18 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.SeekBar;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.Random;
 import java.util.List;
+import java.util.Random;
 
 public class PlayListService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
 
     //media player
-    private ImageView mPlayerControl;
-    private SeekBar mSeek_Bar;
+
     public MediaPlayer player;
     //song list
     private ArrayList<LinkedHashMap<String,String>> songs;
@@ -51,7 +46,7 @@ public class PlayListService extends Service implements
     public boolean pause;
     private final Handler handler=new Handler();
     Intent intent;
-    protected LinkedHashMap<Integer,String> theIDs= new LinkedHashMap<>();
+    protected LinkedHashMap<Integer,String> theIDs;
 
     public void onCreate(){
         //create the service
@@ -144,22 +139,23 @@ public class PlayListService extends Service implements
         //get song
 
         //get title
-         //songTitle=songs.get(songPosn).get("SongTitle");
-        Track track = new Track();
-         track= TrackList.get(songPosn);
+        //songTitle=songs.get(songPosn).get("SongTitle");
+       Track track;
+        track= TrackList.get(songPosn);
         songTitle=track.getTitle();
+        String SongPath=theIDs.get(track.getID());
         //get id
         // long currSong = playSong.getID();
         //set uri
 
         //set the data source
-          try{
-            player.setDataSource(theIDs.get(track.getID()));
+        try{
+            player.setDataSource(SongPath);
         }
         catch(Exception e){
-          Log.e("MUSIC SERVICE", "Error setting data source", e);
+            Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
-           player.prepareAsync();
+        player.prepareAsync();
     }
 
 
@@ -168,7 +164,7 @@ public class PlayListService extends Service implements
 
     //set the song
     public void setSong(int songIndex){
-songPosn=songIndex;
+        songPosn=songIndex;
 
 
     }
@@ -179,13 +175,13 @@ songPosn=songIndex;
         return songPosn;
     }
     public void TestMethod(){
-      if(theIDs!=null){
-          Log.d("PlayListService ","Map sent and recieved");
-      }
+        if(theIDs!=null){
+            Log.d("PlayListService ","Map sent and recieved");
+        }
         else
-      {
-          Log.d("PlayListService","Unsuccesful map not recived");
-      }
+        {
+            Log.d("PlayListService","Unsuccesful map not recived");
+        }
     }
     @Override
     public void  onCompletion(MediaPlayer mp) {
@@ -233,7 +229,7 @@ songPosn=songIndex;
         startForeground(NOTIFY_ID, not);
 
 
-}
+    }
 
 
     //playback methods
@@ -252,7 +248,7 @@ songPosn=songIndex;
     }
 
     public void pausePlayer(){
-       player.pause();
+        player.pause();
     }
 
 
@@ -270,7 +266,6 @@ songPosn=songIndex;
     public void PauseState(boolean Pause_state){
         pause=Pause_state;
     }
-
 
     //skip to next
     public void playNext(){

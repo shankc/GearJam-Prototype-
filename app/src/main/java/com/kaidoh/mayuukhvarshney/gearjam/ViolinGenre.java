@@ -3,6 +3,7 @@ package com.kaidoh.mayuukhvarshney.gearjam;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
@@ -32,37 +33,46 @@ public class ViolinGenre extends MainActivity {
            if (position == 0) {
                intent.putExtra("Instrument", "violin");
                intent.putExtra("Genre", "dubstep");
+
                startActivity(intent);
 
            } else if (position == 1) {
                intent.putExtra("Instrument", "violin");
                intent.putExtra("Genre", "classical");
+
                startActivity(intent);
            } else if (position == 2) {
                intent.putExtra("Instrument", "violin");
                intent.putExtra("Genre", "orchestral");
+
                startActivity(intent);
 
            } else if (position == 3) {
                intent.putExtra("Instrument", "violin");
                intent.putExtra("Genre", "folk");
+
                startActivity(intent);
            } else if (position == 4) {
                intent.putExtra("Instrument", "violin");
                intent.putExtra("Genre", "contemporary classical");
+
                startActivity(intent);
            } else if (position == 5) {
                intent.putExtra("Instrument", "violin");
+
                intent.putExtra("Genre", "jazz");
+
                startActivity(intent);
            } else if (position == 6) {
                intent.putExtra("Instrument", "violin");
                intent.putExtra("Genre", "instrumental");
+
                startActivity(intent);
 
            } else {
                intent.putExtra("Instrument","violin");
                intent.putExtra("Genre","soundtrack");
+
                startActivity(intent);
            }
        }
@@ -81,6 +91,11 @@ public class ViolinGenre extends MainActivity {
                 }
             }
         });
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d("ElectronicGenere", "has come to onResume State");
     }
     @Override
     public void onBackPressed(){

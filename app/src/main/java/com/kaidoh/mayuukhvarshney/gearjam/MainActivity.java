@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.app.NotificationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,23 +68,28 @@ protected NotificationManager manager;
                 //Toast.makeText(MainActivity.this,"item clikced " +position,Toast.LENGTH_SHORT).show();
                 if (position == 0) {
                     Intent intent = new Intent(MainActivity.this, GuitarGenre.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
 
 
                 } else if (position == 1) {
                     Intent intent = new Intent(MainActivity.this, ViolinGenre.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
 
                 } else if (position == 2) {
                     Intent intent = new Intent(MainActivity.this,ElectronicGenre.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
                 }
                 else if(position==3){
                     Intent intent = new Intent(MainActivity.this,PianoGenre.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
                 }
                 else if(position==4){
                     Intent intent = new Intent(MainActivity.this,SitarGenre.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
                 }
                 else if(position==6){
@@ -129,11 +135,15 @@ protected NotificationManager manager;
         }
         else if(id==R.id.playlist_item){
             Intent intent= new Intent(this,Playlist.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d("ElectronicGenere", "has come to onResume State");
     }
     @Override
     public void onBackPressed(){

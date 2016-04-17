@@ -10,6 +10,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
 public class ImageAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private int mItemHeight = 0;
@@ -18,7 +21,9 @@ public class ImageAdapter extends BaseAdapter {
     private int Len;
     private int []ICONS=new int[8];
     private String[] CONTENT=new String[8];
+    protected Context mContext;
     public ImageAdapter(Context context,int [] img,String[] txt) {
+        mContext=context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mImageViewLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,mItemHeight);
         for(int i=0;i<img.length;i++)
@@ -76,7 +81,8 @@ public class ImageAdapter extends BaseAdapter {
         if (cover.getLayoutParams().height != mItemHeight) {
             cover.setLayoutParams(mImageViewLayoutParams);
         }
-        cover.setImageResource(ICONS[position % ICONS.length]);
+        //cover.setImageResource(ICONS[position % ICONS.length]);
+        Picasso.with(mContext).load(ICONS[position%ICONS.length]).into(cover);
         title.setText(CONTENT[position % CONTENT.length]);
 
         return view;
