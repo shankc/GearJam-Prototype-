@@ -27,9 +27,10 @@ public class ViolinGenre extends MainActivity {
         ViolinGrid= (GridView) findViewById(R.id.grid_view1);
         ViolinGrid.setAdapter(ViolinImageAdapter);
    ViolinGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+       Intent intent = new Intent(ViolinGenre.this, DisplayTrackActivity.class);
        @Override
        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-           Intent intent = new Intent(ViolinGenre.this, DisplayTrackActivity.class);
+
            if (position == 0) {
                intent.putExtra("Instrument", "violin");
                intent.putExtra("Genre", "dubstep");
@@ -75,6 +76,7 @@ public class ViolinGenre extends MainActivity {
 
                startActivity(intent);
            }
+           //finish();
        }
    });
         ViolinGrid.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {

@@ -75,6 +75,7 @@ public class ElectronicGenre extends MainActivity {
 
                 startActivity(intent);
             }
+            //finish();
         }
     });
     ElectronicGrid.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {

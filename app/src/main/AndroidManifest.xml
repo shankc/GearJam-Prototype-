@@ -4,7 +4,9 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE">
+
+    </uses-permission>
     <application
         android:name=".AppControl"
         android:allowBackup="true"
@@ -15,6 +17,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,7 +27,7 @@
         </activity>
         <activity android:name=".GuitarGenre"
             android:label="GearJam"
-
+          android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"
 
             >
@@ -38,6 +41,7 @@
         </activity>
         <activity android:name=".ViolinGenre"
                   android:parentActivityName=".MainActivity"
+            android:launchMode="singleTop"
 
 
 
@@ -46,6 +50,7 @@
         </activity>
         <activity android:name=".ElectronicGenre"
             android:parentActivityName=".MainActivity"
+            android:launchMode="singleTop"
 
 
             >
@@ -58,12 +63,14 @@
         </activity>
         <activity android:name=".SitarGenre"
             android:parentActivityName=".MainActivity"
+            android:launchMode="singleTop"
 
 
             >
 
         </activity>
         <activity android:name=".PianoGenre"
+            android:launchMode="singleTop"
                  android:parentActivityName=".MainActivity"
 
 

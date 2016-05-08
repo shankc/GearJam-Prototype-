@@ -39,9 +39,10 @@ public class GuitarGenre  extends MainActivity{
 // set image adapter to the GridView
         GuitarGrid.setAdapter(GuitarimageAdapter);
         GuitarGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            Intent intent = new Intent(GuitarGenre.this, DisplayTrackActivity.class);
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(GuitarGenre.this, DisplayTrackActivity.class);
+
                 if (position == 0) {
 
                     intent.putExtra("Instrument", "guitar");
@@ -84,6 +85,7 @@ public class GuitarGenre  extends MainActivity{
 
                     startActivity(intent);
                 }
+               // finish();
             }
         });
 //get the view tree observer of the grid and set the height and numcols dynamically

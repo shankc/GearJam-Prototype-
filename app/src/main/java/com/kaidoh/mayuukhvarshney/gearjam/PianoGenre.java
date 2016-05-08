@@ -70,7 +70,7 @@ public class PianoGenre extends MainActivity {
 
                     startActivity(intent);
                 }
-
+                //finish();
 
             }
         });

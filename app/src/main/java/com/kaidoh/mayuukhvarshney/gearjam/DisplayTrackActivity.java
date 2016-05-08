@@ -1,6 +1,7 @@
 package com.kaidoh.mayuukhvarshney.gearjam;
 
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,7 +10,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
@@ -67,6 +67,8 @@ public class DisplayTrackActivity extends AppCompatActivity implements SongList.
     protected  File folder;
     Map<String, String> params = new HashMap<>();
     Map<String, Integer> offset = new HashMap<>();
+    private ProgressDialog pDialog;
+    public static final int progress_bar_type = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,9 +113,9 @@ public class DisplayTrackActivity extends AppCompatActivity implements SongList.
         ft.addToBackStack(null);
         ft.commit();
 
-      folder = new File(Environment.getExternalStorageDirectory()+File.separator+"GearJam");
+      folder =this.getDir("GearJam", Context.MODE_PRIVATE); //new File(Environment.getExternalStorageDirectory()+File.separator+"GearJam");
 
-        boolean success=true;
+        boolean success=false;
         if(!folder.exists())
         {
             success=folder.mkdir();
@@ -265,7 +267,7 @@ public class DisplayTrackActivity extends AppCompatActivity implements SongList.
             }
             else
             {
-                Log.d("DisplayTrackActivity","Crashing here run"+musicBound );
+                Log.d("DisplayTrackActivity","Crashing here run "+musicBound);
             }
         }
     };
@@ -366,7 +368,12 @@ public class DisplayTrackActivity extends AppCompatActivity implements SongList.
             Log.d("DisplayTrackActivty","~True");
         }
         if(musicBound && SuperInst!=null)
-        {
+        {   // Pop the stack of previous fragments.
+
+            FragmentManager fm = getSupportFragmentManager();
+            fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            // create new fragment and add to BackStack.
             SongList fragobj=new SongList();
             Bundle bundle=new Bundle();
             bundle.putString("Instrument", SuperInst);
@@ -385,6 +392,12 @@ public class DisplayTrackActivity extends AppCompatActivity implements SongList.
         {
             Log.d("DisplayTrackActivity","In else if method");
             onStart();
+            // clear the backstack of all previous fragments.
+            FragmentManager fm = getSupportFragmentManager();
+            fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+            // Add new Fragment
+
             SongList fragobj=new SongList();
             Bundle bundle=new Bundle();
             bundle.putString("Instrument", SuperInst);

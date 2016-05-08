@@ -71,6 +71,7 @@ public class SitarGenre extends MainActivity {
                     intent.putExtra("Genre", "Ambient");
                     startActivity(intent);
                 }
+               // finish();
             }
         });
         SitarGrid.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {

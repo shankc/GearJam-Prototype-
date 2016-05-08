@@ -6,6 +6,9 @@ import android.app.Application;
 /**
  * Created by mayuukhvarshney on 01/04/16.
  */
+
+// this class exisits for communication between two activities.!! mainly the displayactivity class and playlist class!!
+
 public class AppControl extends Application {
     private static AppControl mInstance;
     Playlist play;

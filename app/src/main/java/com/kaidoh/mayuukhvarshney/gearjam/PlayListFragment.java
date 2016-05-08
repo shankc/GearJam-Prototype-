@@ -2,7 +2,6 @@ package com.kaidoh.mayuukhvarshney.gearjam;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,7 +37,7 @@ public class PlayListFragment extends Fragment {
     protected LinkedHashMap<Integer,String> IDS;
     protected int tempID;
     protected String tempPath;
-    private int Current_position=0;
+    protected int Current_position=0;
    PlayListPass data;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,7 +51,8 @@ public class PlayListFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.song_list_view);
         mAdapter = new SCTrackAdapter(getActivity(), mPlayListItems);
         listView.setAdapter(mAdapter);
-        File home = new File(Environment.getExternalStorageDirectory() + File.separator + "GearJam");
+       // File home = new File(Environment.getExternalStorageDirectory() + File.separator + "GearJam");
+        File home=getActivity().getFilesDir();
         SCTrackService trackService = SoundCloud.getTrackService();
         if (home.listFiles() == null) {
             Toast.makeText(getActivity(), "No Songs in PlayList :(", Toast.LENGTH_SHORT).show();
@@ -65,14 +65,20 @@ public class PlayListFragment extends Fragment {
                     song.put("SongTitle", file.getName().substring(0, findbracket(file.getName())));
                     song.put("SongPath", file.getPath());
                     String txt = file.getName().substring(0, findbracket(file.getName()));
+
                     SongList.add(song);
                      tempID= convert(filter(file.getName()));
+
                      tempPath = file.getPath();
+
                     IDS.put(tempID,tempPath);
+
                     trackService.getTrack(tempID, new Callback<Track>() {
+
                         @Override
                         public void success(Track track, Response response) {
                            mPlayListItems.add(track);
+                            Log.d("PlayListFragment","Track is"+track.getTitle());
                            //IDS.put(track.getID(),tempPath);
                            //((Playlist)getActivity()).musicSrv.TestMethod();
                             mAdapter.notifyDataSetChanged();
@@ -143,28 +149,31 @@ public class PlayListFragment extends Fragment {
     }
     public String filter(String txt){
 
-        for(int i=0;i<txt.length();i++)
+
+        for(int i=txt.length()-1;i>0;i--)
         {
-            if(txt.charAt(i)=='<' ){
+            if(txt.charAt(i)=='>' ){
                 mark = i;
                 break;
             }
         }
-        int start=mark+1;
-        StringBuilder ID=new StringBuilder();
-        while(txt.charAt(start)!='>')
+        int start=mark-1;
+        StringBuilder temp=new StringBuilder();
+        while(txt.charAt(start)!='<')
         {
-            ID.append(txt.charAt(start));
-            start++;
+            temp.append(txt.charAt(start));
+            start--;
         }
 
-        return ID.toString();
+        String ID = new StringBuffer(temp).
+                reverse().toString();
+        return ID;
     }
     public int findbracket(String txt){
         int flag=0;
-        for(int i=0;i<txt.length();i++)
+        for(int i=txt.length()-1;i>0;i--)
         {
-            if(txt.charAt(i)=='<'){
+            if(txt.charAt(i)=='>'){
                 flag=i;
                 break;
             }

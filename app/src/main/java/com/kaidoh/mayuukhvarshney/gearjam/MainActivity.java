@@ -95,6 +95,7 @@ protected NotificationManager manager;
                 else if(position==6){
 
                 }
+                finish();
             }
         });
 

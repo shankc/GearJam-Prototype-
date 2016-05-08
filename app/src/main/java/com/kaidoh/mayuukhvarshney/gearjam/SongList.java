@@ -3,6 +3,7 @@ package com.kaidoh.mayuukhvarshney.gearjam;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,7 @@ public class SongList extends Fragment {
     DataPass data;
     private Playlist playlist;
     protected int Current_position=0;
+   MusicService mMusicService;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -48,7 +50,7 @@ Bundle bundle=SongList.this.getArguments();
         View view =inflater.inflate(R.layout.song_list, container, false);
 
 
-
+mMusicService=((DisplayTrackActivity)getActivity()).musicSrv;
 
         //Inst = bundle.getString("Instrument");
         //category=bundle.getString("Genre");
@@ -74,8 +76,27 @@ Bundle bundle=SongList.this.getArguments();
             @Override
             public void success(List<Track> tracks, Response response) {
                 loadTracks(tracks);
-                ((DisplayTrackActivity) getActivity()).musicSrv.setList(mPlayListItems);
-                AllSongs = tracks;
+                if(mMusicService!=null){
+                    Log.d("SongList", "All good");
+                    if(getActivity()==null)
+                    {
+                        Log.d("SongList","fucking class is fucking null now WTF!!!");
+                    }
+                    else
+                    {
+                        Log.d("Songlist","Dunno where the problems is ");
+                    }
+                    ((DisplayTrackActivity) getActivity()).musicSrv.setList(mPlayListItems);
+                    AllSongs = tracks;
+
+                }
+                else
+                {
+                    Log.d("SongList","these is a problem with musicsrv becmoing null");
+                    ((DisplayTrackActivity)getActivity()).onStart();
+                    ((DisplayTrackActivity) getActivity()).musicSrv.setList(mPlayListItems);
+                    AllSongs = tracks;
+                }
                 // Log.d("SongList","the songs right now "+mPlayListItems.get(4).getTitle());
 
             }
@@ -83,7 +104,7 @@ Bundle bundle=SongList.this.getArguments();
 
             @Override
             public void failure(RetrofitError error) {
-                // Log.d("FRagment", "Error: " + error);
+                 Log.d("FRagment", "Error: " + error);
                 Toast.makeText(getActivity(), "There was a Problem :(", Toast.LENGTH_SHORT).show();
             }
 

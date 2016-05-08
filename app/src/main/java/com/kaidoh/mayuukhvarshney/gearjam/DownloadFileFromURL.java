@@ -3,8 +3,11 @@ package com.kaidoh.mayuukhvarshney.gearjam;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
+import android.app.NotificationManager;
+import android.support.v4.app.NotificationCompat.Builder;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,6 +23,9 @@ public class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
     String ID,Title;
     Context mContext;
     File Path;
+    int id=1;
+    protected NotificationManager mNotifyManager;
+    protected Builder mBuilder;
     public DownloadFileFromURL(Context context,String trackID,String TL,File folder) // need to pass userID also along with this later..
     {
         ID=trackID;
@@ -32,6 +38,21 @@ public class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        mNotifyManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        mBuilder = new NotificationCompat.Builder(mContext);
+        mBuilder.setContentTitle("Download")
+                .setContentText("Download in progress")
+                .setSmallIcon(R.drawable.start_download);
+        mBuilder.setProgress(100, 0, false);
+        mNotifyManager.notify(id, mBuilder.build());
+
+    }
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        // Update progress
+        mBuilder.setProgress(100, values[0], false);
+        mNotifyManager.notify(id, mBuilder.build());
+        super.onProgressUpdate(values);
     }
 
     @Override
@@ -53,7 +74,7 @@ public class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
 
                 File f = new File(storagePath, fileName);
 
-                FileOutputStream fos = new FileOutputStream(f);
+                FileOutputStream fos =  mContext.openFileOutput(fileName,mContext.MODE_PRIVATE);
                 byte[] buffer = new byte[1024];
                 long total = 0;
                 int len1 = 0;
@@ -67,9 +88,20 @@ public class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
                 if (fos != null) {
                     fos.close();
                 }
-
+                for (int i = 0; i <= 100; i += 5) {
+                    // Sets the progress indicator completion percentage
+                    publishProgress(Math.min(i, 100));
+                    try {
+                        // Sleep for 5 seconds
+                        Thread.sleep(2 * 1000);
+                    } catch (InterruptedException e) {
+                        Log.d("TAG", "sleep failure");
+                    }
+                }
 
             }
+
+
         }
 
         catch (MalformedURLException mue) {
@@ -81,8 +113,8 @@ public class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
                 if(is != null){
                     is.close();
                 }
-            }catch (IOException ioe) {
-                // just going to ignore this one
+            }catch (Exception ioe) {
+              ioe.printStackTrace();
             }
         }
         return "";
@@ -92,8 +124,13 @@ public class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
     @Override
     protected void onPostExecute(String file_url) {
 
+        mBuilder.setContentText("Download complete,added to PlayList");
+        mBuilder.setSmallIcon(R.drawable.download_done);
+        mBuilder.setProgress(0, 0, false);
+        mNotifyManager.notify(id, mBuilder.build());
         Toast.makeText(mContext,"Added To Playlist",Toast.LENGTH_SHORT).show();
         Log.d("Download","Done");
+
 
     }
 
